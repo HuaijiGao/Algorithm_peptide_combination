@@ -1,0 +1,102 @@
+(a)
+
+Approach 1: O(n)
+
+function LinearGreedy(Mol[0 . . . n − 1])
+    BetterMol ← [ ] // Initialise an empty array.
+    Efficacymax ← 0
+    // Find the molecule with the best efficacy
+    for i ← 0 to n − 1 do
+        Efficacy ← test wet lab robot(Mol[i])
+        if Efficacy > Efficacymax then
+            Efficacymax ← Efficacy
+            BetterMol ← [Mol[i]]
+    // Remove the best molecule from Mol
+    Mol ← Mol\{BetterMol}
+    // If adding a new molecule achieves a better efficacy than update the BetterMol array
+    for i ← 0 to n − 2 do
+        // [BetterMol, Mol[i]] is a new array containing the existing elements
+        // in BetterMol and Mol[i]
+        Efficacycomb ← test wet lab robot([BetterMol,Mol[i]])
+        if Efficacycomb > Efficacymax then
+            Efficacymax ← Efficacycomb
+            BetterMol ← [BetterMol,Mol[i]]   
+    return BetterMol,Efficacymax
+
+• The first step of LinearGreedy function is to find the maximum efficacy of one single molecule
+  and make this molecule as the first molecule in the combination list.
+• Next, try to combine the current combination list with a new molecule from the available molecule
+  list and test the efficacy in each try. If the new combination has a better efficacy, add this new
+  molecule to the combination list. Otherwise, abandon this molecule.
+• The time complexity of both the first step and the second step are O(n) since the test wet lab robot
+  is called n and n − 1 times respectively.
+• Thus, the overall time complexity of this algorithm is O(n).
+
+Approach 2: O(n^2)
+
+function QuadraticGreedy(Mol[0 . . . n − 1])
+    BetterMol ← [ ] // Initialise an empty array.
+    Efficacymax ← 0
+    for i ← 0 to n − 1 do
+        // Add one molecule to BetterMol if that increases efficacy the most
+        for i ← 0 to Mol.length − 1 do
+            // [BetterMol, Mol[i]] is a new array containing the existing elements
+            // in BetterMol and Mol[i]
+            Efficacy ← test wet lab robot([BetterMol,Mol[i]])
+            if Efficacy > Efficacymax then
+                Efficacymax ← Efficacy
+                Molmax ← Mol[i]
+        // If such molecule exists, add this molecule to BetterMol and update Mol
+        if Molmax do
+            Mol ← Mol\{Molmax}
+            BetterMol ← [BetterMol,Molmax]
+        // Remove one molecule from BetterMol if that increases efficacy the most
+        // There is no need to test the last element since it just been added in the above code.
+        // So we iterate k from 0 to (BetterMol.length - 2) here.
+        for k ← 0 to BetterMol.length − 2 do
+            Temp ← BetterMol\{BetterMol[k]}
+            Efficacy ← test wet lab robot(Temp)
+            if Efficacy > Efficacymax then
+                Efficacymax ← Efficacy
+                Molremove ← BetterMol[k]
+        // If such molecule exists, remove this molecule from BetterMol
+        if Molremove then
+            BetterMol ← BetterMol\{Molremove}
+    return BetterMol,Efficacymax
+    
+• The QuadraticGreedy function has one outer loop and two inner loops.
+• The first inner loop employs Greedy approach to search for one single molecule, which increases
+  the efficacy the most by adding it to the current combination list. This step requires one scan
+  to the available molecule list (calling test wet lab robot n times), which is O(n).
+• After the first inner loop, this single molecule is added to the combination list and removed from
+  the available molecule list.
+• The second inner loop scans the current combination list (in the worst case, it calls test wet lab
+  robot n times), and trying to find a single molecule that increases the efficacy the most by
+  removing it from the combination list. If such molecule is found, remove it from the combination
+  list. This step costs O(n).
+• The outer loop makes the above inner steps repeat n times until all molecules in the available
+  list has been used.
+• Thus, the overall time complexity of this algorithm is O(n^2).
+
+(b)
+• Both of my approaches not always find the optimal solution and this problem does not have a
+  optimal substructure.
+• In my linear greedy approaches, I nominate a molecule, say A, with the largest efficacy as
+  the first molecule of the combination list. And start to build the combination list by adding new
+  molecule to form ”AB,ABD,ABDF,ABDFG, . . . ”.
+• But in this linear algorithm, it is possible that there is a molecule, say C, that although
+  Efficacy(C) < Efficacy(A), Efficacy(CB) is actually greater than Efficacy(AB). Since
+  the first molecule A is always included, it excludes other combinations that do not include A,
+  which may have achieved a better solution.
+• In my quadratic greedy approach, it explores other possible combinations as an improvement.
+  For example, the first part of the quadratic greedy approach analyses whether Efficacy
+  (ABCD) is greater than Efficacy(ABC). If yes, than molecule D is adding to the list. The
+  second part checks whether Efficacy(BCD) or Efficacy(ACD) or Efficacy(ABD) is greater
+  than Efficacy(ABCD). If yes, update the current combination list.
+• But in this quadratic algorithm, although I have checked other combinations to achieve a better
+  solution. I still abandon some molecules in each step, those abandoned molecules may together
+  form another combinations surpassing the current combinations.
+• Overall, the employment of greedy algorithms can find the local optimal solutions, but they
+  are not always the global optimal solutions. If we try to exhaust every possible combination,
+  the size of this problem will be 2^n − 1, which is a ”stop-the-world” operation. Therefore, 
+  this problem does not have optimal substruture.
